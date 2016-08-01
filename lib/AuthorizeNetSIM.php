@@ -1,3 +1,20 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @rahulrnitc
+ Watch 0
+  Star 0
+  Fork 139 dmullings/sdk-php
+forked from AuthorizeNet/sdk-php
+ Code  Pull requests 0  Wiki  Pulse  Graphs
+Tree: 76ee1c32e7 Find file Copy pathsdk-php/lib/AuthorizeNetSIM.php
+76ee1c3  26 days ago
+@dmullings dmullings adding optional param to include currency code in fingerprint
+2 contributors @ncpga @dmullings
+RawBlameHistory     219 lines (204 sloc)  6.7 KB
 <?php
 /**
  * Easily use the Authorize.Net Server Integration Method(SIM).
@@ -6,7 +23,6 @@
  * @subpackage AuthorizeNetSIM
  * @link       http://www.authorize.net/support/SIM_guide.pdf SIM Guide
  */
-
 /**
  * Easily parse an AuthorizeNet SIM Response.
  * @package    AuthorizeNet
@@ -14,11 +30,9 @@
  */
 class AuthorizeNetSIM extends AuthorizeNetResponse
 {
-
     // For ARB transactions
     public $subscription_id;
     public $subscription_paynum;
-
     /**
      * Constructor.
      *
@@ -83,9 +97,7 @@ class AuthorizeNetSIM extends AuthorizeNetResponse
         $amount = ($this->amount ? $this->amount : "0.00");
         return strtoupper(md5($this->md5_setting . $this->api_login_id . $this->transaction_id . $amount));
     }
-
 }
-
 /**
  * A helper class for using hosted order page.
  *
@@ -197,22 +209,25 @@ class AuthorizeNetSIM_Form
     /**
      * Generates a fingerprint needed for a hosted order form or DPM.
      *
-     * @param string $api_login_id    Login ID.
-     * @param string $transaction_key API key.
-     * @param string $amount          Amount of transaction.
-     * @param string $fp_sequence     An invoice number or random number.
-     * @param string $fp_timestamp    Timestamp.
+     * @param string $api_login_id      Login ID.
+     * @param string $transaction_key   API key.
+     * @param string $amount            Amount of transaction.
+     * @param string $fp_sequence       An invoice number or random number.
+     * @param string $fp_timestamp      Timestamp.
+     * @param string $fp_currency_code  Currency Code
      *
      * @return string The fingerprint.
      */
-    public static function getFingerprint($api_login_id, $transaction_key, $amount, $fp_sequence, $fp_timestamp)
+    public static function getFingerprint($api_login_id, $transaction_key, $amount, $fp_sequence, $fp_timestamp, $fp_currency_code = '')
     {
         $api_login_id = ($api_login_id ? $api_login_id : (defined('AUTHORIZENET_API_LOGIN_ID') ? AUTHORIZENET_API_LOGIN_ID : ""));
         $transaction_key = ($transaction_key ? $transaction_key : (defined('AUTHORIZENET_TRANSACTION_KEY') ? AUTHORIZENET_TRANSACTION_KEY : ""));
         if (function_exists('hash_hmac')) {
-            return hash_hmac("md5", $api_login_id . "^" . $fp_sequence . "^" . $fp_timestamp . "^" . $amount . "^", $transaction_key); 
+            return hash_hmac("md5", $api_login_id . "^" . $fp_sequence . "^" . $fp_timestamp . "^" . $amount . "^" . $fp_currency_code, $transaction_key);
         }
-        return bin2hex(mhash(MHASH_MD5, $api_login_id . "^" . $fp_sequence . "^" . $fp_timestamp . "^" . $amount . "^", $transaction_key));
+        return bin2hex(mhash(MHASH_MD5, $api_login_id . "^" . $fp_sequence . "^" . $fp_timestamp . "^" . $amount . "^" . $fp_currency_code, $transaction_key));
     }
     
 }
+Contact GitHub API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Privacy Security Status Help
